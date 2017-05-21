@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="GeneratePdf_ColudService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="GeneratePdf_WCFService">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=syncfusionchart;AccountKey=laF1rtgUTbM8XTDmRTISJSZM7C7KkbzYqFWyDD9sj5w6+kBB8nKz8EWTuhJcbCjrbj/6XrUZSfSX0Z4V5tBdAA==" />
+    </ConfigurationSettings>
+  </Role>
+</ServiceConfiguration>
