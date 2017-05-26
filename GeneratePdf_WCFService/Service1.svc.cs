@@ -3,6 +3,8 @@ using Syncfusion.DocToPDFConverter;
 using Syncfusion.DocIO.DLS;
 using Syncfusion.Pdf;
 using System.IO;
+using System.Security.Authentication;
+using System.Text.RegularExpressions;
 using Syncfusion.ExcelChartToImageConverter;
 using Syncfusion.ExcelToPdfConverter;
 using Syncfusion.Presentation;
@@ -15,8 +17,14 @@ namespace GeneratePdf_WCFService
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        public string GeneratePdf(string value, string type)
+        private static readonly String _authKey = "sfzvwaeru8233gxcs3arfz";
+
+        public string GeneratePdf(string value, string type, string authKey)
         {
+            if (!_authKey.Equals(authKey))
+            {
+                throw new AuthenticationException("AuthKey not valid");
+            }
             PdfDocument pdf;
             MemoryStream stream;
             switch (type)

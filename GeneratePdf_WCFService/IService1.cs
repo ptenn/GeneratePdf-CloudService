@@ -13,6 +13,6 @@ namespace GeneratePdf_WCFService
     public interface IService1
     {
         [OperationContract]
-        string GeneratePdf(string value, string type);
+        string GeneratePdf(string value, string type, string authKey);
     }
 }
