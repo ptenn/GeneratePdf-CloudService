@@ -4,7 +4,7 @@ using Syncfusion.DocIO.DLS;
 using Syncfusion.Pdf;
 using System.IO;
 using System.Security.Authentication;
-using System.Text.RegularExpressions;
+using log4net;
 using Syncfusion.ExcelChartToImageConverter;
 using Syncfusion.ExcelToPdfConverter;
 using Syncfusion.Presentation;
@@ -17,6 +17,8 @@ namespace GeneratePdf_WCFService
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
+        private static ILog logger = LogManager.GetLogger(typeof(Service1));
+
         private static readonly String _authKey = "sfzvwaeru8233gxcs3arfz";
 
         public string GeneratePdf(string value, string type, string authKey)
@@ -50,7 +52,10 @@ namespace GeneratePdf_WCFService
                     pdf.Close();
                     document.Close();
                     //Returns the stream data as Base 64 string
-                    return Convert.ToBase64String(stream.ToArray());
+                    string returnData = Convert.ToBase64String(stream.ToArray());
+                    logger.Info($"Returing converted stream as Base 64 data: {returnData}");
+
+                    return returnData;
                 // Excel
                 case ".xlsx":
                 case ".xlsm":
