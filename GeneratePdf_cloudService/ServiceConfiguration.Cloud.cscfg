@@ -4,6 +4,7 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=syncfusionchart;AccountKey=laF1rtgUTbM8XTDmRTISJSZM7C7KkbzYqFWyDD9sj5w6+kBB8nKz8EWTuhJcbCjrbj/6XrUZSfSX0Z4V5tBdAA==" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="3800fd6d-ad59-4e86-9c4b-6b4156247799" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
