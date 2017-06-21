@@ -39,6 +39,7 @@ namespace GeneratePdf_WCFService
                 case ".rtf":
                 case ".dot":
                 case ".dotx":
+                    logger.Info($"Loading Word Document with value: {value}");
                     //Loading word document
                     WordDocument document = new WordDocument(new MemoryStream(Convert.FromBase64String(value)));
                     DocToPDFConverter conv = new DocToPDFConverter();
