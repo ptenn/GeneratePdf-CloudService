@@ -39,24 +39,36 @@ namespace GeneratePdf_WCFService
                 case ".rtf":
                 case ".dot":
                 case ".dotx":
-                    logger.Info($"Loading Word Document with value: {value}");
-                    //Loading word document
-                    WordDocument document = new WordDocument(new MemoryStream(Convert.FromBase64String(value)));
-                    DocToPDFConverter conv = new DocToPDFConverter();
-                    //Converts the word document to pdf
-                    pdf = conv.ConvertToPDF(document);
-                    stream = new MemoryStream();
-                    //Saves the Pdf document to stream
-                    pdf.Save(stream);
-                    //Sets the stream position
-                    stream.Position = 0;
-                    pdf.Close();
-                    document.Close();
-                    //Returns the stream data as Base 64 string
-                    string returnData = Convert.ToBase64String(stream.ToArray());
-                    logger.Info($"Returing converted stream as Base 64 data: {returnData}");
+                    try
+                    {
+                        logger.Info($"111 Loading Word Document with value: {value}");
+                        //Loading word document
+                        WordDocument document = new WordDocument(new MemoryStream(Convert.FromBase64String(value)));
+                        logger.Info("Created Word Document");
+                        DocToPDFConverter conv = new DocToPDFConverter();
+                        //Converts the word document to pdf
+                        pdf = conv.ConvertToPDF(document);
+                        logger.Info("Converted to PDF");
+                        stream = new MemoryStream();
+                        //Saves the Pdf document to stream
+                        pdf.Save(stream);
+                        logger.Info("Saved PDF to Stream");
+                        //Sets the stream position
+                        stream.Position = 0;
+                        pdf.Close();
+                        document.Close();
+                        //Returns the stream data as Base 64 string
+                        string returnData = Convert.ToBase64String(stream.ToArray());
+                        logger.Info($"Returing converted stream as Base 64 data: {returnData}");
 
-                    return returnData;
+                        return returnData;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e);
+                        throw;
+                    }
+
                 // Excel
                 case ".xlsx":
                 case ".xlsm":
