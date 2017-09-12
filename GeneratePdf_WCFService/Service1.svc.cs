@@ -21,8 +21,6 @@ namespace GeneratePdf_WCFService
     {
         private static ILog logger = LogManager.GetLogger(typeof(Service1));
 
-        private static readonly String _localStorageDir = "c:/convert";
-
         private static readonly String _authKey = "sfzvwaeru8233gxcs3arfz";
 
         public string GeneratePdf(string value, string type, string authKey)
@@ -46,17 +44,11 @@ namespace GeneratePdf_WCFService
                     try
                     {
                         // Clean up old files
-                        FileCleanupJob fileCleanupJob = new FileCleanupJob();
-                        
-                        fileCleanupJob.Cleanup(_localStorageDir, 24);
                         logger.Info($"111 Loading Word Document with value: {value}");
                         string baseFileName = DateTime.Now.ToString("yyyyMMddHHmmss"); 
                         //Loading word document
                         WordDocument document = new WordDocument(new MemoryStream(Convert.FromBase64String(value)));                        
                         logger.Info("Created Word Document");
-                        string wordDocFileName = Path.Combine(_localStorageDir, baseFileName + ".docx");
-                        document.Save(wordDocFileName, FormatType.Docx);
-                        logger.Info($"Saved Word Document {wordDocFileName}");
                         DocToPDFConverter conv = new DocToPDFConverter();
                         //Converts the word document to pdf
                         pdf = conv.ConvertToPDF(document);                        
@@ -65,9 +57,6 @@ namespace GeneratePdf_WCFService
                         //Saves the Pdf document to stream
                         pdf.Save(stream);
                         logger.Info("Saved PDF to Stream");
-                        string pdfDocFileName = Path.Combine(_localStorageDir, baseFileName + ".pdf");
-                        pdf.Save(pdfDocFileName);
-                        logger.Info($"Saved PDF Document {pdfDocFileName}");
                         //Sets the stream position
                         stream.Position = 0;
                         pdf.Close();
