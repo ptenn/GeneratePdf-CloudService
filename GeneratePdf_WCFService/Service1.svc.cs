@@ -3,6 +3,7 @@ using Syncfusion.DocToPDFConverter;
 using Syncfusion.DocIO.DLS;
 using Syncfusion.Pdf;
 using System.IO;
+using System.Net;
 using System.Security.Authentication;
 using GeneratePdf_WCFService.Jobs;
 using log4net;
@@ -41,37 +42,44 @@ namespace GeneratePdf_WCFService
                 case ".rtf":
                 case ".dot":
                 case ".dotx":
-                    try
+                    // Retrieve the Blob Uri as a String
+                    using (WebClient webClient = new WebClient())
                     {
-                        // Clean up old files
-                        logger.Info($"111 Loading Word Document with value: {value}");
-                        string baseFileName = DateTime.Now.ToString("yyyyMMddHHmmss"); 
-                        //Loading word document
-                        WordDocument document = new WordDocument(new MemoryStream(Convert.FromBase64String(value)));                        
-                        logger.Info("Created Word Document");
-                        DocToPDFConverter conv = new DocToPDFConverter();
-                        //Converts the word document to pdf
-                        pdf = conv.ConvertToPDF(document);                        
-                        logger.Info("Converted to PDF");
-                        stream = new MemoryStream();
-                        //Saves the Pdf document to stream
-                        pdf.Save(stream);
-                        logger.Info("Saved PDF to Stream");
-                        //Sets the stream position
-                        stream.Position = 0;
-                        pdf.Close();
-                        document.Close();
-                        //Returns the stream data as Base 64 string
-                        string returnData = Convert.ToBase64String(stream.ToArray());
-                        logger.Info($"Returing converted stream as Base 64 data: {returnData}");
+                        try
+                        {
+                            // Retrive the Blob URI (Document) and convert it into a bytearray.
+                            // From there it is Base-64 encoded for sending via Service call. 
+                            byte[] bytes = webClient.DownloadData(value);
+                            logger.Info($"111 Loading Word Document with value: {value}");
+                            //Loading word document
+                            WordDocument document = new WordDocument(new MemoryStream(bytes));
+                            logger.Info("Created Word Document");
+                            DocToPDFConverter conv = new DocToPDFConverter();
+                            //Converts the word document to pdf
+                            pdf = conv.ConvertToPDF(document);
+                            logger.Info("Converted to PDF");
+                            stream = new MemoryStream();
+                            //Saves the Pdf document to stream
+                            pdf.Save(stream);
+                            logger.Info("Saved PDF to Stream");
+                            //Sets the stream position
+                            stream.Position = 0;
+                            pdf.Close();
+                            document.Close();
+                            //Returns the stream data as Base 64 string
+                            string returnData = Convert.ToBase64String(stream.ToArray());
+                            logger.Info($"Returing converted stream as Base 64 data: {returnData}");
 
-                        return returnData;
+                            return returnData;
+
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex);
+                            throw;
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        logger.Error(e);
-                        throw;
-                    }
+                    // Clean up old files
 
                 // Excel
                 case ".xlsx":
@@ -80,25 +88,42 @@ namespace GeneratePdf_WCFService
                 case ".xls":
                 case ".xltx":
                 case ".csv":
-                    ExcelEngine excelEngine = new ExcelEngine();
-                    IApplication application = excelEngine.Excel;
+                    // Retrieve the Blob Uri as a String
+                    using (WebClient webClient = new WebClient())
+                    {
+                        try
+                        {
+                            // Retrive the Blob URI (Document) and convert it into a bytearray.
+                            // From there it is Base-64 encoded for sending via Service call. 
+                            byte[] bytes = webClient.DownloadData(value);
 
-                    application.ChartToImageConverter = new ChartToImageConverter();
+                            ExcelEngine excelEngine = new ExcelEngine();
+                            IApplication application = excelEngine.Excel;
 
-                    IWorkbook workbook = application.Workbooks.Open(new MemoryStream(Convert.FromBase64String(value)), ExcelOpenType.Automatic);
+                            application.ChartToImageConverter = new ChartToImageConverter();
 
-                    ExcelToPdfConverter convert = new ExcelToPdfConverter(workbook);
-                    pdf = convert.Convert();
-                    stream = new MemoryStream();
+                            IWorkbook workbook =
+                                application.Workbooks.Open(new MemoryStream(bytes), ExcelOpenType.Automatic);
 
-                    //Saves the Pdf document to stream
-                    pdf.Save(stream);
-                    //Sets the stream position
-                    stream.Position = 0;
-                    pdf.Close();
-                    workbook.Close();
-                    //Returns the stream data as Base 64 string
-                    return Convert.ToBase64String(stream.ToArray());
+                            ExcelToPdfConverter convert = new ExcelToPdfConverter(workbook);
+                            pdf = convert.Convert();
+                            stream = new MemoryStream();
+
+                            //Saves the Pdf document to stream
+                            pdf.Save(stream);
+                            //Sets the stream position
+                            stream.Position = 0;
+                            pdf.Close();
+                            workbook.Close();
+                            //Returns the stream data as Base 64 string
+                            return Convert.ToBase64String(stream.ToArray());
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex);
+                            throw;
+                        }
+                    }
                 // PowerPoint
                 case ".pptx":
                 case ".pptm":
@@ -109,25 +134,40 @@ namespace GeneratePdf_WCFService
                 case ".pot":
                 case ".ppsm":
                 case ".pps":
-                    //Opens a PowerPoint Presentation
-                    IPresentation presentation = Presentation.Open(new MemoryStream(Convert.FromBase64String(value)));
+                    // Retrieve the Blob Uri as a String
+                    using (WebClient webClient = new WebClient())
+                    {
+                        try
+                        {
+                            // Retrive the Blob URI (Document) and convert it into a bytearray.
+                            // From there it is Base-64 encoded for sending via Service call. 
+                            byte[] bytes = webClient.DownloadData(value);
+                            //Opens a PowerPoint Presentation
+                            IPresentation presentation = Presentation.Open(new MemoryStream(bytes));
 
-                    //Creates an instance of ChartToImageConverter and assigns it to ChartToImageConverter property of Presentation
-                    presentation.ChartToImageConverter = new Syncfusion.OfficeChartToImageConverter.ChartToImageConverter();
+                            //Creates an instance of ChartToImageConverter and assigns it to ChartToImageConverter property of Presentation
+                            presentation.ChartToImageConverter = new Syncfusion.OfficeChartToImageConverter.ChartToImageConverter();
 
-                    //Converts the PowerPoint Presentation into PDF document
-                    pdf = PresentationToPdfConverter.Convert(presentation);
+                            //Converts the PowerPoint Presentation into PDF document
+                            pdf = PresentationToPdfConverter.Convert(presentation);
 
-                    stream = new MemoryStream();
-                    //Saves the PDF document
-                    pdf.Save(stream);
+                            stream = new MemoryStream();
+                            //Saves the PDF document
+                            pdf.Save(stream);
 
-                    //Sets the stream position
-                    stream.Position = 0;
-                    pdf.Close();
-                    presentation.Close();
-                    //Returns the stream data as Base 64 string
-                    return Convert.ToBase64String(stream.ToArray());
+                            //Sets the stream position
+                            stream.Position = 0;
+                            pdf.Close();
+                            presentation.Close();
+                            //Returns the stream data as Base 64 string
+                            return Convert.ToBase64String(stream.ToArray());
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex);
+                            throw;
+                        }
+                    }
             }
             return null;
         }
